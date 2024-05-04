@@ -66,7 +66,6 @@ const StudentPanel = () => {
             const majorRes = await getMajorCourses("CS");
             setMajorCourses(majorRes);
             const foundationRes = await getMajorCourses("FND");
-            console.log(foundationRes);
             setFoundationCourses(foundationRes);
         }
         fetchData().catch(console.error);
@@ -84,7 +83,7 @@ const StudentPanel = () => {
                             </ListItemIcon>
                             <Typography sx={{width: '30%'}}>{course.code}</Typography>
                             <Typography sx={{width: '60%'}}>{course.name}</Typography>
-                            <Typography sx={{width: '10%'}}>{course.grade}</Typography>
+                            <Typography sx={{width: '10%'}}>{course.grade || "-"}</Typography>
                         </ListItem>
                     </Paper>
                 )}
@@ -138,14 +137,14 @@ const StudentPanel = () => {
                                 <Typography sx={{width: '35%'}}>{course.name}</Typography>
                                 <Typography sx={{width: '5%'}}>{course.grade}</Typography>
                                 <Box sx={{width: '50%', display: 'flex', justifyContent: 'flex-start'}}>
-                                    <Typography sx={{mx: 2, width: '15%'}}>
-                                        {course.ah.length > 1 ? course.ah.join(', ') : course.ah}
+                                    <Typography sx={{mx: 2, width: '30%'}}>
+                                        {course.ah.length > 0 ? course.ah.join(', ') : "-"}
                                     </Typography>
-                                    <Typography sx={{mx: 2, width: '15%'}}>
-                                        {course.ss.length > 1 ? course.ss.join(', ') : course.ss}
+                                    <Typography sx={{mx: 2, width: '30%'}}>
+                                        {course.ss.length > 0 ? course.ss.join(', ') : "-"}
                                     </Typography>
-                                    <Typography sx={{mx: 2, width: '15%'}}>
-                                        {course.qs.length > 1 ? course.qs.join(', ') : course.qs}
+                                    <Typography sx={{mx: 2, width: '30%'}}>
+                                        {course.qs.length > 0 ? course.qs.join(', ') : "-"}
                                     </Typography>
                                 </Box>
                             </ListItem>
