@@ -1,12 +1,24 @@
-import {Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText} from "@mui/material";
+import {Box, Typography, Paper, List, ListItem, ListItemIcon} from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useEffect, useState} from "react";
 import {getMajorCourses, getStudentCourses} from "../api/api";
-import {CLUSTER_COLORS} from "../utils/constants";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import ClusterCourses from "./ClusterCourses";
+import handleSubmit from '../handles/handlesubmit';
+import { useRef } from 'react';
 
 const StudentPanel = () => {
+
+    const dataRef = useRef()
+
+    const submithandler = (e) => {
+        e.preventDefault()
+        handleSubmit(dataRef.current.value)
+        dataRef.current.value = ""
+    }
 
     const [studentCourses, setStudentCourses] = useState([]);
     const [clusterCourses, setClusterCourses] = useState([]);
@@ -21,7 +33,7 @@ const StudentPanel = () => {
             const modifiedClustered = clustered.map((course) => ({
                 ...course, ah: [], ss: [], qs: []
             }))
-            modifiedClustered.map((course) => {
+            modifiedClustered.forEach((course) => {
                 course.clusters.forEach((cluster) => {
                     if (cluster < 4) {
                         course.ah.push(cluster);
@@ -76,7 +88,7 @@ const StudentPanel = () => {
             <Typography variant='h5'>Major Courses</Typography>
             <List>
                 {passedCourses.map((course) =>
-                    <Paper sx={{my: 1}}>
+                    <Paper sx={{my: 1}} key={course.code}>
                         <ListItem>
                             <ListItemIcon>
                                 {getIconFromGrade(course.grade)}
@@ -97,62 +109,32 @@ const StudentPanel = () => {
             m: 1
         }}>
             <Typography variant='h5'>Foundation</Typography>
-            <Box sx={{m: 1, display:'flex', justifyContent: 'center'}}>
-            <List sx={{width: '80%'}}>
-                {passedFoundationCourses.map((course) =>
-                    <Paper sx={{my: 1}}>
-                        <ListItem>
-                            <ListItemIcon>
-                                {getIconFromGrade(course.grade)}
-                            </ListItemIcon>
-                            <Typography sx={{width: '10%'}}>{course.code}</Typography>
-                            <Typography sx={{width: '35%'}}>{course.name}</Typography>
-                            <Typography sx={{width: '5%'}}>{course.grade}</Typography>
-                        </ListItem>
-                    </Paper>
-                )}
-            </List>
-            </Box>
-            <Typography variant='h5'>Cohesive Clusters</Typography>
-            <Box sx={{
-                display: 'flex', flexDirection: 'row',
-                justifyContent: 'space-evenly',
-                m: 2
-            }}>
-                <Paper sx={{background: CLUSTER_COLORS.AH, py: 4, px: 2}}><Typography>Arts &
-                    Humanities</Typography></Paper>
-                <Paper sx={{background: CLUSTER_COLORS.SS, py: 4, px: 2}}><Typography>Social
-                    Sciences</Typography></Paper>
-                <Paper sx={{background: CLUSTER_COLORS.QS, py: 4, px: 2}}><Typography>Quantitative Sciences</Typography></Paper>
-            </Box>
-            <Box sx={{m: 1, display:'flex', justifyContent: 'center'}}>
+            <Box sx={{m: 1, display: 'flex', justifyContent: 'center'}}>
                 <List sx={{width: '80%'}}>
-                    {clusterCourses.map((course) =>
-                        <Paper sx={{my: 1}}>
+                    {passedFoundationCourses.map((course) =>
+                        <Paper sx={{my: 1}} key={course.code}>
                             <ListItem>
                                 <ListItemIcon>
-                                    <ErrorOutlineIcon/>
+                                    {getIconFromGrade(course.grade)}
                                 </ListItemIcon>
                                 <Typography sx={{width: '10%'}}>{course.code}</Typography>
                                 <Typography sx={{width: '35%'}}>{course.name}</Typography>
                                 <Typography sx={{width: '5%'}}>{course.grade}</Typography>
-                                <Box sx={{width: '50%', display: 'flex', justifyContent: 'flex-start'}}>
-                                    <Typography sx={{mx: 2, width: '30%'}}>
-                                        {course.ah.length > 0 ? course.ah.join(', ') : "-"}
-                                    </Typography>
-                                    <Typography sx={{mx: 2, width: '30%'}}>
-                                        {course.ss.length > 0 ? course.ss.join(', ') : "-"}
-                                    </Typography>
-                                    <Typography sx={{mx: 2, width: '30%'}}>
-                                        {course.qs.length > 0 ? course.qs.join(', ') : "-"}
-                                    </Typography>
-                                </Box>
                             </ListItem>
                         </Paper>
                     )}
                 </List>
             </Box>
+            <DndProvider backend={HTML5Backend}>
+                <ClusterCourses clusterCourses={clusterCourses}/>
+            </DndProvider>
         </Box>
+        <div className="App">
+            <form onSubmit={submithandler}>
+                <input type= "text" ref={dataRef} />
+                <button type = "submit">Save</button>
+            </form>
+        </div>
     </Box>
 }
 

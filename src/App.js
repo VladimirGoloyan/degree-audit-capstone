@@ -20,7 +20,7 @@ function App() {
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => setUser(codeResponse),
-        onError: (error) => console.log('Login Failed:', error)
+        onError: (error) => console.error('Login Failed:', error)
     });
 
     useEffect(
@@ -36,7 +36,7 @@ function App() {
                     .then((res) => {
                         setProfile(res.data);
                     })
-                    .catch((err) => console.log(err));
+                    .catch((err) => console.error(err));
             }
         },
         [user]

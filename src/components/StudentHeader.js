@@ -13,7 +13,7 @@ const StudentHeader = (props) => {
         alignItems: 'center',
         width: '90%'
     }}>
-        <img src={picture} alt="user image"/>
+        <img src={picture} alt="user"/>
         <Typography variant='h4'>{studentName}</Typography>
         <Typography>{major}</Typography>
         <Typography>Credits: {credits}</Typography>
