@@ -1,18 +1,25 @@
-import { addDoc, collection } from "@firebase/firestore"
+import {collection, doc, setDoc} from "@firebase/firestore"
 import { firestore } from "../firebase/firebase"
 
-const handleSubmit = (testdata) => {
-    const ref = collection(firestore, "users") // Firebase creates this automatically
 
-    let data = {
-        testData: testdata
-    }
+// Admin util
 
+// export const uploadMajorCourses = (major, courses) => {
+// const ref = collection(firestore, "majors");
+//     try {
+//         const coursesRef = doc(ref, major);
+//         setDoc(coursesRef, {[major]: courses})
+//     } catch(err) {
+//         console.log(err)
+//     }
+// }
+
+export const uploadCompletedCourses = (studentId, courses) => {
+    const ref = collection(firestore, "completedCourses");
     try {
-        addDoc(ref, data)
+        const coursesRef = doc(ref, studentId);
+        setDoc(coursesRef, {[studentId]: courses})
     } catch(err) {
         console.log(err)
     }
 }
-
-export default handleSubmit

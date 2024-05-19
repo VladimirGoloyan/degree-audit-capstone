@@ -1,24 +1,17 @@
-import {Box, Typography, Paper, List, ListItem, ListItemIcon} from "@mui/material";
+import {Box, Typography, Paper, List, ListItem, ListItemIcon, CircularProgress} from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useEffect, useState} from "react";
-import {getMajorCourses, getStudentCourses} from "../api/api";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import ClusterCourses from "./ClusterCourses";
-import handleSubmit from '../handles/handlesubmit';
-import { useRef } from 'react';
+import {getCoursesByMajor, getStudentCompletedCourses} from "../handles/handleCourses";
+import {FOUNDATION_NAME, getMajorCode} from "../utils/constants";
 
-const StudentPanel = () => {
+const StudentPanel = (props) => {
 
-    const dataRef = useRef()
-
-    const submithandler = (e) => {
-        e.preventDefault()
-        handleSubmit(dataRef.current.value)
-        dataRef.current.value = ""
-    }
+    const {studentId, major} = props;
 
     const [studentCourses, setStudentCourses] = useState([]);
     const [clusterCourses, setClusterCourses] = useState([]);
@@ -29,7 +22,7 @@ const StudentPanel = () => {
 
     const getCoursesForClusters = (courses) => {
         if (studentCourses) {
-            const clustered = courses.filter((course) => course.clusters);
+            const clustered = courses?.filter((course) => course.clusters);
             const modifiedClustered = clustered.map((course) => ({
                 ...course, ah: [], ss: [], qs: []
             }))
@@ -49,8 +42,8 @@ const StudentPanel = () => {
     }
 
     const mapPassedCourses = (majors, setter) => {
-        const fullCourses = majors.map((course) => {
-            const getGrade = studentCourses.find(passedCourse => course.code === passedCourse.code)?.grade;
+        const fullCourses = majors?.map((course) => {
+            const getGrade = studentCourses?.find(passedCourse => course.code === passedCourse.code)?.grade;
             return {...course, grade: Boolean(getGrade) ? getGrade : null}
         })
         setter(fullCourses);
@@ -72,34 +65,35 @@ const StudentPanel = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await getStudentCourses();
+            const res = await getStudentCompletedCourses(studentId);
             setStudentCourses(res);
             // TO-DO change major to get from student object
-            const majorRes = await getMajorCourses("CS");
+            const majorRes = await getCoursesByMajor(getMajorCode(major));
             setMajorCourses(majorRes);
-            const foundationRes = await getMajorCourses("FND");
+            const foundationRes = await getCoursesByMajor(getMajorCode(FOUNDATION_NAME));
             setFoundationCourses(foundationRes);
         }
         fetchData().catch(console.error);
-    }, [])
+    }, [studentId, major])
 
     return <Box sx={{width: '85vw', flexGrow: 1, display: 'flex', flexDirection: 'row'}}>
         <Box sx={{width: '20vw', flexGrow: 1, m: 1}}>
             <Typography variant='h5'>Major Courses</Typography>
-            <List>
-                {passedCourses.map((course) =>
-                    <Paper sx={{my: 1}} key={course.code}>
-                        <ListItem>
-                            <ListItemIcon>
-                                {getIconFromGrade(course.grade)}
-                            </ListItemIcon>
-                            <Typography sx={{width: '30%'}}>{course.code}</Typography>
-                            <Typography sx={{width: '60%'}}>{course.name}</Typography>
-                            <Typography sx={{width: '10%'}}>{course.grade || "-"}</Typography>
-                        </ListItem>
-                    </Paper>
-                )}
-            </List>
+            {passedCourses?.length !== 0 ?
+                <List>
+                    {passedCourses?.map((course) =>
+                        <Paper sx={{my: 1}} key={course.code}>
+                            <ListItem>
+                                <ListItemIcon>
+                                    {getIconFromGrade(course.grade)}
+                                </ListItemIcon>
+                                <Typography sx={{width: '30%'}}>{course.code}</Typography>
+                                <Typography sx={{width: '60%'}}>{course.name}</Typography>
+                                <Typography sx={{width: '10%'}}>{course.grade || "-"}</Typography>
+                            </ListItem>
+                        </Paper>
+                    )}
+                </List> : <CircularProgress/>}
         </Box>
         <Box sx={{
             width: '65vw',
@@ -110,31 +104,26 @@ const StudentPanel = () => {
         }}>
             <Typography variant='h5'>Foundation</Typography>
             <Box sx={{m: 1, display: 'flex', justifyContent: 'center'}}>
-                <List sx={{width: '80%'}}>
-                    {passedFoundationCourses.map((course) =>
-                        <Paper sx={{my: 1}} key={course.code}>
-                            <ListItem>
-                                <ListItemIcon>
-                                    {getIconFromGrade(course.grade)}
-                                </ListItemIcon>
-                                <Typography sx={{width: '10%'}}>{course.code}</Typography>
-                                <Typography sx={{width: '35%'}}>{course.name}</Typography>
-                                <Typography sx={{width: '5%'}}>{course.grade}</Typography>
-                            </ListItem>
-                        </Paper>
-                    )}
-                </List>
+                {passedFoundationCourses.length !== 0 ?
+                    <List sx={{width: '80%'}}>
+                        {passedFoundationCourses.map((course) =>
+                            <Paper sx={{my: 1}} key={course.code}>
+                                <ListItem>
+                                    <ListItemIcon>
+                                        {getIconFromGrade(course.grade)}
+                                    </ListItemIcon>
+                                    <Typography sx={{width: '10%'}}>{course.code}</Typography>
+                                    <Typography sx={{width: '35%'}}>{course.name}</Typography>
+                                    <Typography sx={{width: '5%'}}>{course.grade}</Typography>
+                                </ListItem>
+                            </Paper>
+                        )}
+                    </List> : <CircularProgress/>}
             </Box>
             <DndProvider backend={HTML5Backend}>
                 <ClusterCourses clusterCourses={clusterCourses}/>
             </DndProvider>
         </Box>
-        <div className="App">
-            <form onSubmit={submithandler}>
-                <input type= "text" ref={dataRef} />
-                <button type = "submit">Save</button>
-            </form>
-        </div>
     </Box>
 }
 

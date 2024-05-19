@@ -1,4 +1,4 @@
-import {Alert, Box, Button, List, Paper, Typography} from "@mui/material";
+import {Alert, Box, Button, CircularProgress, List, Paper, Typography} from "@mui/material";
 import {CLUSTER_COLORS} from "../utils/constants";
 import DragableCourses from "./DragableCourses";
 import {useEffect, useState} from "react";
@@ -160,7 +160,11 @@ const ClusterCourses = (props) => {
                 justifyContent: 'space-evenly',
                 m: 2,
             }}>
-                <Paper ref={ahDropRef} sx={{background: CLUSTER_COLORS.AH, p: 1,  border: getClusterCompletion('ah') ? '4px solid green' : ''}}>
+                <Paper ref={ahDropRef} sx={{
+                    background: CLUSTER_COLORS.AH,
+                    p: 1,
+                    border: getClusterCompletion('ah') ? '4px solid green' : ''
+                }}>
                     <Typography variant='h6'>Arts
                         & Humanities {activeNumbers.ah}</Typography>
                     <Box sx={{my: 1}}>{courses.ah.map((course) => {
@@ -169,7 +173,11 @@ const ClusterCourses = (props) => {
                     {courses.ah.length !== 0 &&
                         <Button variant='contained' onClick={() => clearClusterCourses('ah')}>Clear Selection</Button>}
                 </Paper>
-                <Paper ref={ssDropRef} sx={{background: CLUSTER_COLORS.SS, p: 1, border: getClusterCompletion('ss') ? '4px solid green' : ''}}><Typography variant='h6'>Social
+                <Paper ref={ssDropRef} sx={{
+                    background: CLUSTER_COLORS.SS,
+                    p: 1,
+                    border: getClusterCompletion('ss') ? '4px solid green' : ''
+                }}><Typography variant='h6'>Social
                     Sciences {activeNumbers.ss}</Typography>
                     <Box sx={{my: 1}}>{courses.ss.map((course) => {
                         return <Typography key={course.code}>{course.code}</Typography>
@@ -177,7 +185,11 @@ const ClusterCourses = (props) => {
                     {courses.ss.length !== 0 &&
                         <Button variant='contained' onClick={() => clearClusterCourses('ss')}>Clear Selection</Button>}
                 </Paper>
-                <Paper ref={qsDropRef} sx={{background: CLUSTER_COLORS.QS, p: 1, border: getClusterCompletion('qs') ? '4px solid green' : ''}}><Typography variant='h6'>Quantitative
+                <Paper ref={qsDropRef} sx={{
+                    background: CLUSTER_COLORS.QS,
+                    p: 1,
+                    border: getClusterCompletion('qs') ? '4px solid green' : ''
+                }}><Typography variant='h6'>Quantitative
                     Sciences {activeNumbers.qs}</Typography>
                     <Box sx={{my: 1}}>{courses.qs.map((course) => {
                         return <Typography key={course.code}>{course.code}</Typography>
@@ -187,14 +199,16 @@ const ClusterCourses = (props) => {
                 </Paper>
             </Box>
             <Box sx={{m: 1, display: 'flex', justifyContent: 'center'}}>
-                <List sx={{width: '80%'}}>
-                    {clusterCourses.map((course) => <DragableCourses key={course.code} code={course.code}
-                                                                     name={course.name}
-                                                                     grade={course.grade} ah={course.ah} ss={course.ss}
-                                                                     qs={course.qs}
-                                                                     color={getCourseColor(course.code)}/>
-                    )}
-                </List>
+                {clusterCourses.length !== 0 ?
+                    <List sx={{width: '80%'}}>
+                        {clusterCourses.map((course) => <DragableCourses key={course.code} code={course.code}
+                                                                         name={course.name}
+                                                                         grade={course.grade} ah={course.ah}
+                                                                         ss={course.ss}
+                                                                         qs={course.qs}
+                                                                         color={getCourseColor(course.code)}/>
+                        )}
+                    </List> : <CircularProgress/>}
             </Box>
         </>)
 }

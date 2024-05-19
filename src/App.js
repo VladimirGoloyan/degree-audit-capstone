@@ -1,22 +1,16 @@
-import {Box, Paper, Typography} from "@mui/material";
+import {Box, Button, Typography} from "@mui/material";
 import StudentHeader from "./components/StudentHeader";
 import StudentPanel from "./components/StudentPanel";
 import React, {useState, useEffect} from 'react';
 import {googleLogout, useGoogleLogin} from '@react-oauth/google';
 import axios from "axios";
+import {getUser} from "./handles/handleUser";
 
 function App() {
 
-    const mockStudentValues = {
-        studentName: "Some Name",
-        major: "Computer Science",
-        majorCode: "CS",
-        credits: 78,
-        gpa: 2.2
-    }
 
-    const [user, setUser] = useState([]);
-    const [profile, setProfile] = useState([]);
+    const [user, setUser] = useState(null);
+    const [profile, setProfile] = useState(null);
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => setUser(codeResponse),
@@ -35,19 +29,21 @@ function App() {
                     })
                     .then((res) => {
                         setProfile(res.data);
+                        getUser(res.data.email).then((response) => {
+                            setProfile((prev) => ({...prev, ...response}));
+                        })
                     })
                     .catch((err) => console.error(err));
+
             }
         },
         [user]
     );
-
     const logOut = () => {
         googleLogout();
         setProfile(null);
     };
 
-    const admin = false;
     return (
         profile ? (
             <Box sx={{
@@ -61,20 +57,25 @@ function App() {
                 overflowX: 'hidden',
                 background: '#dddddd',
             }}>
-                {admin &&
-                    <Paper sx={{width: '15vw', flexGrow: 1, m: 0}}>
-                        <Typography>Admin Panel</Typography>
-                    </Paper>}
                 <Box sx={{width: '85vw', heigth: '100%', display: 'flex', flexDirection: 'column'}}>
-                    <StudentHeader studentName={profile?.name} major={mockStudentValues.major}
-                                   credits={mockStudentValues.credits} gpa={mockStudentValues.gpa}
+                    <StudentHeader studentName={profile?.name} major={profile?.major}
+                                   credits={profile?.credits} gpa={profile?.GPA}
                                    picture={profile?.picture} logOut={logOut}/>
-                    <StudentPanel/>
+                    <StudentPanel studentId={profile?.studentId} major={profile?.major}/>
                 </Box>
             </Box>
 
         ) : (
-            <button onClick={login}>Sign in with Google 🚀 </button>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                background: 'navy'
+            }}>
+                <Typography variant='h3' sx={{m: 2, color: 'white'}}>Degree Audit Application</Typography>
+                <Button onClick={login} variant={'contained'} sx={{m: 2, color: 'white'}}>Sign in with Google 🚀</Button>
+            </Box>
         )
 
 

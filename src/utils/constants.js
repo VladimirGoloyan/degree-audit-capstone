@@ -10,3 +10,14 @@ export const CLUSTER_COLORS = {
 }
 
 export const clientID = '1747207834-7tgs02p5htvvanh9i2opch7gk6j0p77b.apps.googleusercontent.com';
+export const FOUNDATION_NAME = "Foundation";
+export const getMajorCode = (majorName) => {
+    switch (majorName) {
+        case "Computer Science":
+            return "CS";
+        case "Foundation":
+            return "FND";
+        default:
+            return ""
+    }
+}
